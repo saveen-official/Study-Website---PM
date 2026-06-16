@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pointers & Modular Programming — SE1012 Study Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6ef;
+    --panel: #ffffff;
+    --ink: #2a2420;
+    --ink-soft: #5c5249;
+    --rule: #e4dccd;
+    --accent: #c1542c;
+    --accent-soft: #f3e3d8;
+    --mem: #2f6f5e;
+    --mem-soft: #e3efe9;
+    --code-bg: #2a2420;
+    --code-ink: #f4ede2;
+    --code-key: #f0a35e;
+    --code-str: #9fd6b8;
+    --code-com: #8a8078;
+    --code-fn: #f6c177;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Source Sans 3', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 17px;
+  }
+
+  /* ---------- Layout shell ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 28px 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar .brand {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+  .sidebar .brand span { color: var(--code-key); }
+  .sidebar .subtitle {
+    font-size: 0.8rem;
+    color: #c9c0b4;
+    margin-bottom: 26px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .nav-group { margin-bottom: 18px; }
+  .nav-group h4 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #a99e90;
+    margin: 0 0 8px 4px;
+    font-weight: 600;
+  }
+  .nav-group a {
+    display: block;
+    color: #e8e1d6;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    transition: background 0.15s, color 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-group a:hover {
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+  }
+  .nav-group a.active {
+    background: rgba(255,255,255,0.1);
+    color: var(--code-key);
+    border-left: 2px solid var(--code-key);
+  }
+
+  /* ---------- Main content ---------- */
+  main {
+    padding: 48px 64px 100px;
+    max-width: 880px;
+  }
+
+  .hero {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    line-height: 1.08;
+    margin: 0 0 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .hero p.lead {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin-bottom: 22px;
+  }
+  .hero-mailbox {
+    display: flex;
+    gap: 18px;
+    align-items: stretch;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .mailbox-card {
+    flex: 1;
+    min-width: 220px;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .mailbox-card .num {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .mailbox-card .lbl {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section h2 {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  section > .deck {
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+    max-width: 640px;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 28px 0 10px;
+  }
+  p { margin: 0 0 14px; }
+
+  /* ---------- Code blocks ---------- */
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: var(--radius);
+    padding: 0 0 18px;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    margin: 22px 0 14px;
+    line-height: 1.6;
+  }
+  .code-block .filename {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 5px;
+    letter-spacing: 0.04em;
+    margin: -11px 0 12px 16px;
+  }
+  .code-block pre {
+    margin: 0;
+    padding: 0 20px 4px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-block:has(.filename) pre { padding-top: 0; }
+  .code-block:not(:has(.filename)) { padding-top: 18px; }
+  .code-block .kw { color: #ef9678; }
+  .code-block .type { color: var(--code-key); }
+  .code-block .str { color: var(--code-str); }
+  .code-block .com { color: var(--code-com); font-style: italic; }
+  .code-block .fn { color: var(--code-fn); }
+  .code-block .out { color: #9bc4e2; }
+
+  /* ---------- Memory diagram boxes ---------- */
+  .mem-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+  }
+  .mem-box {
+    background: var(--mem-soft);
+    border: 1px solid #c7e0d4;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 160px;
+  }
+  .mem-box .name {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--mem);
+    font-size: 0.95rem;
+  }
+  .mem-box .val {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    margin-top: 6px;
+  }
+  .mem-box .addr {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .arrow-down {
+    text-align: center;
+    color: var(--mem);
+    font-size: 1.4rem;
+    margin: -4px 0;
+  }
+
+  /* ---------- Callouts ---------- */
+  .callout {
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-left: 4px solid;
+  }
+  .callout.tip { background: var(--mem-soft); border-color: var(--mem); }
+  .callout.warn { background: #fbeae0; border-color: var(--accent); }
+  .callout.note { background: #f1f0fb; border-color: #6c63b5; }
+  .callout .lbl {
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .callout.tip .lbl { color: var(--mem); }
+  .callout.warn .lbl { color: var(--accent); }
+  .callout.note .lbl { color: #6c63b5; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* ---------- Comparison tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.92rem;
+    background: var(--panel);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  th {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code, th code { font-family: var(--font-mono); font-size: 0.85em; }
+
+  code:not(.code-block code) {
+    font-family: var(--font-mono);
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+
+  /* ---------- Lab cards ---------- */
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 18px 0;
+  }
+  .lab-card {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .lab-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .lab-card .num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .lab-card h4 {
+    font-family: var(--font-display);
+    margin: 6px 0 8px;
+    font-size: 1.05rem;
+  }
+  .lab-card p { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 10px; }
+  .lab-card .skills { font-size: 0.78rem; color: var(--mem); font-weight: 600; }
+
+  /* ---------- Quiz / self-check ---------- */
+  .quiz {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 18px 0;
+  }
+  .quiz .q { font-weight: 600; margin-bottom: 10px; }
+  .quiz .options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz button.opt {
+    text-align: left;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    color: var(--ink);
+  }
+  .quiz button.opt:hover { border-color: var(--accent); }
+  .quiz button.opt.correct { background: var(--mem-soft); border-color: var(--mem); font-weight: 600; }
+  .quiz button.opt.incorrect { background: var(--accent-soft); border-color: var(--accent); }
+  .quiz .feedback { margin-top: 10px; font-size: 0.9rem; display: none; }
+  .quiz .feedback.show { display: block; }
+
+  /* ---------- Practice sets ---------- */
+  .practice-set {
+    margin-top: 36px;
+    border-top: 2px dashed var(--rule);
+    padding-top: 22px;
+  }
+  .practice-set .ps-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .practice-set .ps-icon {
+    background: var(--ink);
+    color: var(--code-key);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .practice-set .ps-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .quiz.practice {
+    border-left: 3px solid var(--ink);
+    background: #fdfcf8;
+  }
+  .quiz.practice .q-type {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .fill-in {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin: 14px 0;
+    border-left: 3px solid var(--ink);
+    background: #fdfcf8;
+  }
+  .fill-in .q-type {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .fill-in .q { font-weight: 600; margin-bottom: 12px; }
+  .fill-in .code-snippet {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 10px 0;
+    line-height: 1.6;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .fill-in .code-snippet .kw { color: #ef9678; }
+  .fill-in .code-snippet .type { color: var(--code-key); }
+  .fill-in .code-snippet .com { color: var(--code-com); font-style: italic; }
+  .fill-in .code-snippet .fn  { color: var(--code-fn); }
+  .fill-in .code-snippet .str { color: var(--code-str); }
+  .fill-in input[type="text"] {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    padding: 7px 11px;
+    border: 2px solid var(--rule);
+    border-radius: 7px;
+    background: var(--bg);
+    color: var(--ink);
+    width: 130px;
+    margin: 4px 2px;
+    transition: border-color 0.15s;
+  }
+  .fill-in input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  .fill-in input.correct-fi { border-color: var(--mem); background: var(--mem-soft); }
+  .fill-in input.incorrect-fi { border-color: var(--accent); background: var(--accent-soft); }
+  .fill-in .check-btn {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+    margin-top: 10px;
+    display: block;
+    transition: opacity 0.15s;
+  }
+  .fill-in .check-btn:hover { opacity: 0.8; }
+  .fill-in .fi-feedback { margin-top: 10px; font-size: 0.88rem; display: none; }
+  .fill-in .fi-feedback.show { display: block; }
+
+  /* ---------- Coding challenges ---------- */
+  .code-challenge {
+    margin: 14px 0;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    background: #fdfcf8;
+    overflow: hidden;
+  }
+  .cc-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cc-header .cc-badge {
+    background: var(--code-key);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .cc-header .cc-title {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    font-weight: 600;
+    flex: 1;
+  }
+  .cc-body { padding: 16px 18px; }
+  .cc-task {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    line-height: 1.55;
+  }
+  .cc-task strong { color: var(--accent); }
+  .cc-hints {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: var(--mem-soft);
+    border-radius: 7px;
+    border-left: 3px solid var(--mem);
+  }
+  .cc-hints ul { margin: 4px 0 0; padding-left: 18px; }
+  .cc-hints li { margin-bottom: 3px; }
+  .cc-editor {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    line-height: 1.6;
+    padding: 14px 16px;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border: none;
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 160px;
+    outline: none;
+    tab-size: 4;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .cc-editor:focus { box-shadow: 0 0 0 2px var(--accent); }
+  .cc-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .cc-btn {
+    border: none;
+    padding: 9px 18px;
+    border-radius: 7px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .cc-btn:hover { opacity: 0.87; transform: translateY(-1px); }
+  .cc-btn.run  { background: var(--accent); color: #fff; }
+  .cc-btn.hint { background: var(--mem-soft); color: var(--mem); border: 1px solid var(--mem); }
+  .cc-btn.sol  { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--rule); }
+  .cc-result {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .cc-result.show { display: block; }
+  .cc-result.pass { background: var(--mem-soft); color: var(--mem); border: 1px solid #b0d8c8; }
+  .cc-result.fail { background: var(--accent-soft); color: #7a2e10; border: 1px solid #e8b8a0; }
+  .cc-result .res-title { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .cc-result .res-detail { font-size: 0.85rem; line-height: 1.5; }
+  .cc-solution {
+    display: none;
+    margin-top: 14px;
+    border-top: 1px dashed var(--rule);
+    padding-top: 14px;
+  }
+  .cc-solution.show { display: block; }
+  .cc-solution .sol-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .cc-solution pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0;
+    line-height: 1.6;
+  }
+  .cc-solution .kw  { color: #ef9678; }
+  .cc-solution .type { color: var(--code-key); }
+  .cc-solution .fn  { color: var(--code-fn); }
+  .cc-solution .str { color: var(--code-str); }
+  .cc-solution .com { color: var(--code-com); font-style: italic; }
+  .cc-solution .out { color: #9bc4e2; }
+  .playground {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin: 18px 0;
+  }
+  .playground .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .playground button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-family: var(--font-body);
+    transition: opacity 0.15s;
+  }
+  .playground button:hover { opacity: 0.88; }
+  .playground button.secondary {
+    background: var(--mem);
+  }
+  .playground .stage {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    min-height: 130px;
+  }
+  .pg-var {
+    background: var(--mem-soft);
+    border: 2px solid var(--mem);
+    border-radius: 10px;
+    padding: 14px 22px;
+    text-align: center;
+    min-width: 100px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .pg-var.pointer {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .pg-var .lbl { font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem; }
+  .pg-var .v { font-family: var(--font-mono); font-size: 1.4rem; margin-top: 6px; min-height: 28px; }
+  .pg-var .addr-lbl { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-soft); margin-top: 4px; }
+  .pg-log {
+    margin-top: 16px;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-height: 50px;
+  }
+  .pg-log .line { margin-bottom: 4px; }
+  .pg-log .line:last-child { margin-bottom: 0; }
+
+  /* ---------- Glossary ---------- */
+  .glossary dt {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 14px;
+  }
+  .glossary dd { margin: 4px 0 0; color: var(--ink-soft); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 24px;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+  }
+
+  .pill-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .pill {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; }
+    main { padding: 32px 24px 80px; }
+    .hero h1 { font-size: 2.2rem; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .pg-var { transition: none; }
+  }
+
+  ::selection { background: var(--code-key); color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="sidebar">
+    <div class="brand">se1012<span>.h</span></div>
+    <div class="subtitle">Pointers &amp; Arrays Study Guide</div>
+
+    <div class="nav-group">
+      <h4>Start here</h4>
+      <a href="#intro">Why pointers?</a>
+      <a href="#basics">Pointer basics</a>
+      <a href="#playground">Try it: pointer playground</a>
+    </div>
+
+    <div class="nav-group">
+      <h4>Core ideas</h4>
+      <a href="#output-params">Output parameters</a>
+      <a href="#scope">Scope of names</a>
+      <a href="#arithmetic">Pointer arithmetic</a>
+      <a href="#arrays">Pointers &amp; arrays</a>
+      <a href="#double-pointer">Pointer to pointer</a>
+      <a href="#const">Const &amp; void pointers</a>
+      <a href="#func-pointers">Function pointers</a>
+    </div>
+
+    <div class="nav-group">
+      <h4>Practice</h4>
+      <a href="#lab8">Lab 08 walkthrough</a>
+      <a href="#lab7">Lab 07 recap (arrays)</a>
+      <a href="#quiz">Self-check quiz</a>
+    </div>
+
+    <div class="nav-group">
+      <h4>Reference</h4>
+      <a href="#glossary">Glossary</a>
+      <a href="#pitfalls">Common mistakes</a>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <!-- HERO -->
+    <header class="hero" id="intro">
+      <div class="eyebrow">SE1012 · Programming Methodology · Week 6–8</div>
+      <h1>Pointers click into place once you stop fearing the address.</h1>
+      <p class="lead">
+        This guide turns Lecture 6 (Pointers &amp; Modular Programming), Lab 07 (Arrays)
+        and Lab 08 (Pointers &amp; Modular Programming) into one calm, beginner-paced
+        walkthrough — with a live playground so you can <em>see</em> what a pointer is
+        doing instead of just reading about it.
+      </p>
+      <div class="hero-mailbox">
+        <div class="mailbox-card">
+          <div class="num">&amp;</div>
+          <div class="lbl">"Address-of" — get where a variable lives</div>
+        </div>
+        <div class="mailbox-card">
+          <div class="num">*</div>
+          <div class="lbl">"Dereference" — get/set what's stored there</div>
+        </div>
+        <div class="mailbox-card">
+          <div class="num">→</div>
+          <div class="lbl">Pointers let functions reach back and change your variables</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ BASICS ============ -->
+    <section id="basics">
+      <h2><span class="tag">01 · concept</span></h2>
+      <h2 style="margin-top:-30px">What is a pointer, really?</h2>
+      <p class="deck">
+        Every variable lives somewhere in memory. A pointer is just another variable —
+        but instead of storing a number or a letter, it stores <strong>the address</strong>
+        of where another variable lives.
+      </p>
+
+      <p>
+        Think of memory as a street of numbered houses. A normal variable is a house with
+        something inside it (a value). A pointer is a piece of paper with a house's
+        <strong>address</strong> written on it. The pointer doesn't contain the value —
+        it tells you where to go to find the value.
+      </p>
+
+      <div class="mem-row">
+        <div class="mem-box">
+          <div class="name">int m = 25;</div>
+          <div class="val">25</div>
+          <div class="addr">lives at 0x100000000A</div>
+        </div>
+        <div class="mem-box">
+          <div class="name">int *p = &amp;m;</div>
+          <div class="val">0x100000000A</div>
+          <div class="addr">p "points to" m</div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="lbl">The two symbols you need first</span>
+        <p>
+          <code>&amp;</code> (address-of) — put it in front of a variable to get its address:
+          <code>&amp;m</code> means "the address where m lives."<br><br>
+          <code>*</code> (dereference / indirection) — put it in front of a pointer to get
+          (or set) the value it points to: <code>*p</code> means "the value stored at the
+          address p holds."
+        </p>
+      </div>
+
+      <h3>Declaring a pointer</h3>
+      <div class="code-block">
+        <span class="filename">syntax</span>
+<pre><span class="type">type</span> *variable_name;
+
+<span class="com">// Example: a pointer that can store the address of an int</span>
+<span class="type">int</span> *ptr;</pre>
+      </div>
+      <p>
+        The <code>*</code> here doesn't mean "multiply" — in a declaration it means
+        "this variable is a pointer." The <code>type</code> (e.g. <code>int</code>,
+        <code>float</code>) must match the type of the variable it will point to.
+      </p>
+
+      <h3>A full first example</h3>
+      <div class="code-block">
+        <span class="filename">ptr1.c</span>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> m = <span class="out">25</span>;
+    <span class="type">int</span> *p = &amp;m;          <span class="com">// p now holds the address of m</span>
+
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, *p);   <span class="com">// dereference p -> prints 25</span>
+
+    *p = <span class="out">35</span>;             <span class="com">// change m's value THROUGH p</span>
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, m);    <span class="com">// prints 35 - m really changed!</span>
+
+    <span class="kw">return</span> 0;
+}</pre>
+      </div>
+      <p>
+        Nothing here is magic. <code>*p = 35;</code> walks to the address stored in
+        <code>p</code> and overwrites whatever is there — and that "there" happens to be
+        <code>m</code>. This is the entire idea behind "pass by reference" in C.
+      </p>
+
+      <!-- PRACTICE: BASICS -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Pointer basics</span>
+        </div>
+
+        <div class="quiz practice" data-ps="basics">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. What does the <code>&amp;</code> operator do when placed before a variable name?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'No — & does not read the value. That\'s what * does.')">Reads the value stored in the variable</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! &x gives you the memory address where x lives, so you can store that address in a pointer.')">Returns the memory address of the variable</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'No — & on its own does not do arithmetic. It simply gives you an address.')">Adds 1 to the variable</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in" data-ps="basics">
+          <span class="q-type">predict the output</span>
+          <div class="q">2. What will this program print? Type the two output values.</div>
+          <div class="code-snippet"><span class="type">int</span> x = <span class="str">7</span>;
+<span class="type">int</span> *p = &amp;x;
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *p);   <span class="com">// line A</span>
+*p = <span class="str">99</span>;
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, x);    <span class="com">// line B</span></div>
+          <p>Line A prints: <input type="text" id="fi-basics-a" placeholder="?"> &nbsp; Line B prints: <input type="text" id="fi-basics-b" placeholder="?"></p>
+          <button class="check-btn" onclick="checkFillIn('basics-out', ['fi-basics-a','fi-basics-b'], ['7','99'], 'Correct! *p dereferences p to read x (7). Then *p = 99 writes 99 into x, so line B prints x which is now 99.', 'Not quite. *p in line A reads the value at the address p holds — which is x = 7. After *p = 99, x itself becomes 99, so line B prints 99.')">Check answers</button>
+          <div class="fi-feedback" id="basics-out"></div>
+        </div>
+
+        <div class="quiz practice" data-ps="basics">
+          <span class="q-type">multiple choice</span>
+          <div class="q">3. You declare <code>float y = 3.14; float *fp;</code>. Which line correctly makes <code>fp</code> point to <code>y</code>?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'This passes the value of y (3.14) to fp, not the address. fp expects an address, not a float value.')">fp = y;</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! &y gives the address of y. Storing it in fp (a float*) makes fp point to y.')">fp = &amp;y;</button>
+            <button class="opt" onclick="checkAnswer(this, false, '*fp = &y would try to store an address into the value that fp points to — wrong direction, and fp doesn\'t point anywhere yet.')">*fp = &amp;y;</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="code-challenge">
+          <div class="cc-header">
+            <span class="cc-badge">💻 code it</span>
+            <span class="cc-title">Write a pointer that modifies a variable</span>
+          </div>
+          <div class="cc-body">
+            <p class="cc-task">
+              Declare an <code>int</code> variable <strong>score</strong> = 50. Then declare a pointer <strong>p</strong> pointing to it. Use the pointer to <strong>add 10</strong> to score. Finally, print score using <code>printf</code> — it should show <strong>60</strong>.
+            </p>
+            <div class="cc-hints">
+              <strong>Hints:</strong>
+              <ul>
+                <li>Declare: <code>int score = 50;</code> and <code>int *p = &amp;score;</code></li>
+                <li>To add 10 through the pointer: <code>*p = *p + 10;</code></li>
+                <li>Print score with <code>printf("%d\n", score);</code></li>
+              </ul>
+            </div>
+            <textarea class="cc-editor" id="cc-basics" spellcheck="false" placeholder="#include <stdio.h>
+
+int main() {
+    // your code here
+
+    return 0;
+}"></textarea>
+            <div class="cc-actions">
+              <button class="cc-btn run" onclick="checkCode('cc-basics', 'res-basics', [
+                {pat: /int\s+score\s*=\s*50/, msg: 'Declare int score = 50'},
+                {pat: /int\s*\*\s*p\s*=\s*&score/, msg: 'Declare int *p = &score'},
+                {pat: /\*p\s*[=+]/, msg: 'Modify through the pointer (*p = ... or *p += ...)'},
+                {pat: /printf\s*\(/, msg: 'Print the result with printf'}
+              ])">▶ Check my code</button>
+              <button class="cc-btn sol" onclick="toggleSolution('sol-basics')">Show solution</button>
+            </div>
+            <div class="cc-result" id="res-basics"></div>
+            <div class="cc-solution" id="sol-basics">
+              <div class="sol-label">One correct solution:</div>
+              <pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> score = <span class="out">50</span>;
+    <span class="type">int</span> *p = &amp;score;   <span class="com">// p points to score</span>
+
+    *p = *p + <span class="out">10</span>;      <span class="com">// add 10 through the pointer</span>
+
+    <span class="fn">printf</span>(<span class="str">"%d\n"</span>, score); <span class="com">// prints 60</span>
+    <span class="kw">return</span> <span class="out">0</span>;
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLAYGROUND ============ -->
+    <section id="playground">
+      <h2><span class="tag">try it</span></h2>
+      <h2 style="margin-top:-30px">Pointer playground</h2>
+      <p class="deck">
+        Click the buttons in order and watch what happens to <code>m</code> and
+        <code>p</code>. This mirrors the <code>ptr1.c</code> example above.
+      </p>
+
+      <div class="playground">
+        <div class="controls">
+          <button onclick="pgStep(1)">1. int m = 25;</button>
+          <button onclick="pgStep(2)">2. int *p = &amp;m;</button>
+          <button onclick="pgStep(3)">3. printf("%d", *p);</button>
+          <button onclick="pgStep(4)" class="secondary">4. *p = 35;</button>
+          <button onclick="pgStep(5)" class="secondary">5. printf("%d", m);</button>
+          <button onclick="pgReset()">Reset</button>
+        </div>
+        <div class="stage">
+          <div class="pg-var" id="pg-m" style="display:none">
+            <div class="lbl">m</div>
+            <div class="v" id="pg-m-val">?</div>
+            <div class="addr-lbl">address: 0x1000</div>
+          </div>
+          <div class="pg-var pointer" id="pg-p" style="display:none">
+            <div class="lbl">p</div>
+            <div class="v" id="pg-p-val">?</div>
+            <div class="addr-lbl" id="pg-p-points">points to: —</div>
+          </div>
+        </div>
+        <div class="pg-log" id="pg-log">
+          <div class="line">// Output will appear here as you click each step…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OUTPUT PARAMETERS ============ -->
+    <section id="output-params">
+      <h2><span class="tag">02 · concept</span></h2>
+      <h2 style="margin-top:-30px">Functions that return more than one value</h2>
+      <p class="deck">
+        A normal <code>return</code> can only send back <strong>one</strong> value.
+        But what if a function needs to hand back two or three results? That's what
+        <strong>output parameters</strong> are for.
+      </p>
+
+      <p>
+        An output parameter is just a pointer passed into a function. The function
+        dereferences it to <em>write</em> a result directly into the caller's variable —
+        like leaving a note at an address the caller gave you.
+      </p>
+
+      <h3>Example: splitting a number into sign, whole part, and fraction</h3>
+      <div class="code-block">
+        <span class="filename">separate.c</span>
+<pre><span class="com">// num is the INPUT. signp, wholep, fracp are OUTPUTS (pointers)</span>
+<span class="type">void</span> <span class="fn">separate</span>(<span class="type">double</span> num, <span class="type">char</span> *signp, <span class="type">int</span> *wholep, <span class="type">double</span> *fracp) {
+    <span class="type">double</span> magnitude;
+
+    <span class="kw">if</span> (num &lt; 0)
+        *signp = <span class="str">'-'</span>;
+    <span class="kw">else if</span> (num == 0)
+        *signp = <span class="str">' '</span>;
+    <span class="kw">else</span>
+        *signp = <span class="str">'+'</span>;
+
+    magnitude = fabs(num);
+    *wholep = floor(magnitude);
+    *fracp  = magnitude - *wholep;
+}</pre>
+      </div>
+
+      <div class="callout note">
+        <span class="lbl">Why the names end in "p"</span>
+        <p>
+          <code>signp</code>, <code>wholep</code>, <code>fracp</code> — the trailing
+          <code>p</code> is a naming convention meaning "this is a pointer." It's not
+          required by C, but it makes code much easier to read because you instantly
+          know which parameters are <em>outputs</em> (pointers) vs. which are plain
+          <em>inputs</em> (copies).
+        </p>
+      </div>
+
+      <h3>Calling it</h3>
+      <div class="code-block">
+        <span class="filename">main() — calling separate()</span>
+<pre><span class="type">char</span> sn;
+<span class="type">int</span> whl;
+<span class="type">double</span> fr;
+
+<span class="fn">separate</span>(35.817, &amp;sn, &amp;whl, &amp;fr);
+<span class="com">// sn = '+', whl = 35, fr = 0.817</span></pre>
+      </div>
+      <p>
+        Notice: every output parameter is called with <code>&amp;</code> — you're handing
+        <code>separate()</code> the <em>addresses</em> of <code>sn</code>,
+        <code>whl</code>, and <code>fr</code> so it can write results straight into them.
+      </p>
+
+      <h3>Output parameters vs. return values — when to use which</h3>
+      <table>
+        <tr><th>Situation</th><th>Use</th><th>Why</th></tr>
+        <tr>
+          <td>Function produces exactly <strong>one</strong> result (e.g. a sum, an average)</td>
+          <td><code>return</code></td>
+          <td>Simple, and the value can be used directly in an expression</td>
+        </tr>
+        <tr>
+          <td>Function needs to produce <strong>two or more</strong> results (e.g. circumference <em>and</em> area)</td>
+          <td>Output parameters (pointers)</td>
+          <td><code>return</code> can only carry one value back</td>
+        </tr>
+        <tr>
+          <td>Function just modifies existing variables (e.g. <code>swap</code>)</td>
+          <td>Input/output parameters (pointers)</td>
+          <td>No new value to "return" — you're changing what's already there</td>
+        </tr>
+      </table>
+
+      <h3>Matching pointer types — quick table</h3>
+      <table>
+        <tr><th>If the variable is...</th><th>...its address has type</th></tr>
+        <tr><td><code>char x</code></td><td><code>char *</code> (pointer to char)</td></tr>
+        <tr><td><code>int x</code></td><td><code>int *</code> (pointer to int)</td></tr>
+        <tr><td><code>double x</code></td><td><code>double *</code> (pointer to double)</td></tr>
+      </table>
+      <div class="callout warn">
+        <span class="lbl">Type mismatch = bugs</span>
+        <p>
+          If <code>x</code> is an <code>int</code>, its address must be stored in an
+          <code>int *</code>, never a <code>float *</code> or <code>double *</code>.
+          The pointer's type tells C how many bytes to read/write at that address.
+        </p>
+      </div>
+
+      <!-- PRACTICE: OUTPUT PARAMS -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Output parameters</span>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. A function has the signature <code>void get_min_max(int arr[], int n, int *minp, int *maxp)</code>. Why are <code>minp</code> and <code>maxp</code> pointers?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'Pointers don\'t make reading faster here — the reason is about writing results back, not speed.')">Because pointers are faster to read</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! C can only return one value. Pointers let the function write two results (min and max) directly into the caller\'s variables.')">Because the function needs to return two values but C\'s return can only give one</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'Pointers don\'t prevent modification — in fact they allow it. And arrays are already passed by reference.')">To prevent the array from being modified</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">fill in the blank</span>
+          <div class="q">2. Complete the function call so that <code>double_it()</code> can modify <code>val</code> in <code>main()</code>.</div>
+          <div class="code-snippet"><span class="com">// Function definition:</span>
+<span class="kw">void</span> <span class="fn">double_it</span>(<span class="type">int</span> *n) { *n = *n * 2; }
+
+<span class="com">// In main():</span>
+<span class="type">int</span> val = 5;
+<span class="fn">double_it</span>( _____ );   <span class="com">// what goes here?</span>
+<span class="fn">printf</span>(<span class="str">"%d"</span>, val);    <span class="com">// should print 10</span></div>
+          <p>The blank should be: <input type="text" id="fi-op-a" placeholder="?"></p>
+          <button class="check-btn" onclick="checkFillIn('op-out', ['fi-op-a'], ['&val','&amp;val'], 'Correct! You pass &val (the address of val) so that double_it can dereference it and modify the original.', 'Not quite. double_it expects a pointer (int*). To pass val by reference you write &val — the & gives the address.')">Check answer</button>
+          <div class="fi-feedback" id="op-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">predict the output</span>
+          <div class="q">3. After this runs, what does <code>printf("%d %d", a, b);</code> print?
+          <br><small style="font-family:var(--font-mono);font-size:0.85rem;color:var(--ink-soft);">void add_ten(int *x) { *x = *x + 10; }<br>int a=3, b=7; add_ten(&amp;a); add_ten(&amp;b);</small></div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'add_ten changes the originals because pointers are used — a and b in main() are modified.')">3 7</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! add_ten(&a) dereferences the pointer and adds 10 to a (3→13). Same for b (7→17).')">13 17</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'add_ten is called twice — once for a, once for b. Both get +10 separately.')">10 10</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="code-challenge">
+          <div class="cc-header">
+            <span class="cc-badge">💻 code it</span>
+            <span class="cc-title">Function with two output parameters</span>
+          </div>
+          <div class="cc-body">
+            <p class="cc-task">
+              Write a function <strong><code>void min_max(int a, int b, int *minp, int *maxp)</code></strong> that stores the smaller of <code>a, b</code> into <code>*minp</code> and the larger into <code>*maxp</code>. In <code>main()</code>, call it with 8 and 3, then print: <strong>Min: 3, Max: 8</strong>.
+            </p>
+            <div class="cc-hints">
+              <strong>Hints:</strong>
+              <ul>
+                <li>Use an <code>if/else</code> inside the function to decide which is smaller</li>
+                <li>Write results via the pointers: <code>*minp = ...;</code> and <code>*maxp = ...;</code></li>
+                <li>Call it: <code>min_max(8, 3, &amp;mn, &amp;mx);</code></li>
+              </ul>
+            </div>
+            <textarea class="cc-editor" id="cc-outparams" spellcheck="false" placeholder="#include <stdio.h>
+
+void min_max(int a, int b, int *minp, int *maxp) {
+    // your code here
+}
+
+int main() {
+    int mn, mx;
+    // call min_max here, then print
+    return 0;
+}"></textarea>
+            <div class="cc-actions">
+              <button class="cc-btn run" onclick="checkCode('cc-outparams', 'res-outparams', [
+                {pat: /void\s+min_max/, msg: 'Define the void min_max function'},
+                {pat: /int\s*\*\s*minp.*int\s*\*\s*maxp|int\s*\*minp.*int\s*\*maxp/, msg: 'Function must take pointer parameters *minp and *maxp'},
+                {pat: /\*minp\s*=/, msg: 'Assign to *minp inside the function'},
+                {pat: /\*maxp\s*=/, msg: 'Assign to *maxp inside the function'},
+                {pat: /min_max\s*\(/, msg: 'Call min_max() from main()'},
+                {pat: /printf\s*\(/, msg: 'Print the result with printf'}
+              ])">▶ Check my code</button>
+              <button class="cc-btn sol" onclick="toggleSolution('sol-outparams')">Show solution</button>
+            </div>
+            <div class="cc-result" id="res-outparams"></div>
+            <div class="cc-solution" id="sol-outparams">
+              <div class="sol-label">One correct solution:</div>
+              <pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">void</span> <span class="fn">min_max</span>(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> *minp, <span class="type">int</span> *maxp) {
+    <span class="kw">if</span> (a &lt; b) {
+        *minp = a;
+        *maxp = b;
+    } <span class="kw">else</span> {
+        *minp = b;
+        *maxp = a;
+    }
+}
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> mn, mx;
+    <span class="fn">min_max</span>(<span class="out">8</span>, <span class="out">3</span>, &amp;mn, &amp;mx);
+    <span class="fn">printf</span>(<span class="str">"Min: %d, Max: %d\n"</span>, mn, mx);
+    <span class="kw">return</span> <span class="out">0</span>;
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCOPE ============ -->
+    <section id="scope">
+      <h2><span class="tag">03 · concept</span></h2>
+      <h2 style="margin-top:-30px">Scope: where can a name be seen?</h2>
+      <p class="deck">
+        <strong>Scope</strong> is the region of your program where a name (a variable or
+        function) is visible. Getting this right avoids the classic beginner error:
+        "why can't I use this variable here?!"
+      </p>
+
+      <h3>Local scope</h3>
+      <p>
+        A variable declared inside a function (or inside <code>{ }</code>) only exists
+        there. Once the function ends, it's gone.
+      </p>
+      <div class="code-block">
+        <span class="filename">local scope</span>
+<pre><span class="type">void</span> <span class="fn">myFunction</span>() {
+    <span class="type">int</span> localVar = <span class="out">5</span>;  <span class="com">// only visible inside myFunction</span>
+}
+<span class="com">// localVar does not exist out here</span></pre>
+      </div>
+
+      <h3>Block scope</h3>
+      <p>
+        Even tighter: a variable declared inside <code>{ }</code> — like inside an
+        <code>if</code> or a loop — only exists within those braces.
+      </p>
+      <div class="code-block">
+        <span class="filename">block scope</span>
+<pre><span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> x = <span class="out">10</span>;
+    <span class="kw">if</span> (x &gt; 5) {
+        <span class="type">int</span> y = <span class="out">20</span>;   <span class="com">// y only exists inside this { }</span>
+        <span class="fn">printf</span>(<span class="str">"%d"</span>, y);
+    }
+    <span class="com">// printf("%d", y);  -> ERROR: y is not accessible here</span>
+}</pre>
+      </div>
+
+      <h3>Global scope</h3>
+      <p>
+        A variable declared <strong>outside</strong> every function lives for the whole
+        program and can be read/changed by any function.
+      </p>
+      <div class="code-block">
+        <span class="filename">global scope</span>
+<pre><span class="type">int</span> globalVar = <span class="out">10</span>;  <span class="com">// visible to ALL functions below</span>
+
+<span class="type">void</span> <span class="fn">myFunction</span>() {
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, globalVar);  <span class="com">// works fine</span>
+}</pre>
+      </div>
+
+      <div class="callout tip">
+        <span class="lbl">Rule of thumb</span>
+        <p>
+          Declare variables in the smallest scope that works. Most variables should be
+          local to the function (or even the loop) that uses them. Global variables are
+          occasionally useful for true constants, but overusing them makes programs hard
+          to debug because <em>any</em> function could be changing them.
+        </p>
+      </div>
+
+      <h3>Function names and scope</h3>
+      <p>
+        A function name has global scope by default — once declared, it can be called
+        from anywhere below that point in the file. Marking a function
+        <code>static</code> restricts it to only the file it's defined in, which is
+        useful for "helper" functions you don't want other files to call.
+      </p>
+      <div class="code-block">
+        <span class="filename">static function</span>
+<pre><span class="kw">static</span> <span class="type">void</span> <span class="fn">helperFunction</span>() {
+    <span class="com">// This function can only be called within this file</span>
+}</pre>
+      </div>
+
+      <!-- PRACTICE: SCOPE -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Scope of names</span>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. A variable declared inside a <code>for</code> loop like <code>for (int i = 0; ...)</code> — where is <code>i</code> visible?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'A variable declared at the top of main() would be visible everywhere in main(), but i declared inside the for-header is only in the loop.')">Everywhere inside main()</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! i is block-scoped to the for loop. It doesn\'t exist before the loop starts or after it ends.')">Only inside the for loop body</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'Global scope is for variables declared outside every function entirely.')">In any function in the file</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">spot the error</span>
+          <div class="q">2. This code has a scope error. Which line will cause a compiler error, and why?</div>
+          <div class="code-snippet"><span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> x = 10;
+    <span class="kw">if</span> (x &gt; 5) {
+        <span class="type">int</span> y = 20;   <span class="com">// line A</span>
+    }
+    <span class="fn">printf</span>(<span class="str">"%d"</span>, y); <span class="com">// line B</span>
+}</div>
+          <p>The error is on line: <input type="text" id="fi-scope-a" placeholder="A or B?"> because <code>y</code> is declared in <input type="text" id="fi-scope-b" placeholder="which scope?"></p>
+          <button class="check-btn" onclick="checkFillIn('scope-out', ['fi-scope-a','fi-scope-b'], ['B','block'], 'Correct! Line B errors because y was declared inside the if block (block scope). Once the } closes, y no longer exists.', 'Not quite. The error is on line B — y is only visible inside the if { } block where it was declared. Outside that block, y does not exist.')">Check answers</button>
+          <div class="fi-feedback" id="scope-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">3. You have a helper function you only want to be usable within the same <code>.c</code> file. What keyword should you add to its declaration?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'const marks a value as unchangeable, not a function as file-private.')">const</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'void is the return type when a function returns nothing — it has nothing to do with limiting visibility.')">void</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! Adding static before a function definition limits its scope to just the file it\'s in.')">static</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="code-challenge">
+          <div class="cc-header">
+            <span class="cc-badge">💻 code it</span>
+            <span class="cc-title">Spot and fix a scope bug</span>
+          </div>
+          <div class="cc-body">
+            <p class="cc-task">
+              The code below has a <strong>scope bug</strong> — it tries to use a variable outside the block it was declared in. Fix it so it compiles and prints the total (30) correctly. Move or redeclare the variable at the right scope level.
+            </p>
+            <div class="cc-hints">
+              <strong>Hints:</strong>
+              <ul>
+                <li>Declare <code>total</code> <em>before</em> the <code>if</code> block so it's visible afterwards</li>
+                <li>Inside the <code>if</code> block you can still <em>assign</em> to it</li>
+                <li>The variable needs function scope, not block scope</li>
+              </ul>
+            </div>
+            <textarea class="cc-editor" id="cc-scope" spellcheck="false">#include <stdio.h>
+
+int main() {
+    int x = 10;
+    if (x > 5) {
+        int total = x + 20;  // BUG: total is block-scoped here
+    }
+    printf("Total: %d\n", total);  // ERROR: total not visible here
+    return 0;
+}</textarea>
+            <div class="cc-actions">
+              <button class="cc-btn run" onclick="checkCode('cc-scope', 'res-scope', [
+                {pat: /int\s+total/, msg: 'Declare total somewhere'},
+                {pat: /total\s*=/, msg: 'Assign a value to total'},
+                {pat: /printf\s*\(/, msg: 'Print total with printf'},
+                {pat: /(?!.*int total.*\{[\s\S]*?if)/, msg: 'total must be declared before or outside the if block', negate: /int\s+total[\s\S]{0,40}if\s*\(/, negMsg: 'total is still declared inside the if block — move it before the if statement'}
+              ])">▶ Check my code</button>
+              <button class="cc-btn sol" onclick="toggleSolution('sol-scope')">Show solution</button>
+            </div>
+            <div class="cc-result" id="res-scope"></div>
+            <div class="cc-solution" id="sol-scope">
+              <div class="sol-label">Fixed version:</div>
+              <pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> x = <span class="out">10</span>;
+    <span class="type">int</span> total;          <span class="com">// declared at function scope — visible everywhere below</span>
+    <span class="kw">if</span> (x &gt; <span class="out">5</span>) {
+        total = x + <span class="out">20</span>;  <span class="com">// assign inside the if (no re-declaration)</span>
+    }
+    <span class="fn">printf</span>(<span class="str">"Total: %d\n"</span>, total); <span class="com">// now visible here — prints 30</span>
+    <span class="kw">return</span> <span class="out">0</span>;
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ POINTER ARITHMETIC ============ -->
+    <section id="arithmetic">
+      <h2><span class="tag">04 · concept</span></h2>
+      <h2 style="margin-top:-30px">Pointer arithmetic</h2>
+      <p class="deck">
+        When you "add 1" to a pointer, it doesn't move forward by 1 byte — it moves
+        forward by the <strong>size of the type it points to</strong>.
+      </p>
+
+      <div class="code-block">
+        <span class="filename">arithmetic.c</span>
+<pre><span class="type">float</span> x = <span class="out">5.5</span>;
+<span class="type">float</span> *p = &amp;x;
+
+<span class="fn">printf</span>(<span class="str">"%p"</span>, p);    <span class="com">// e.g. 0x7ffee03bc678</span>
+p++;                  <span class="com">// move to the NEXT float in memory</span>
+<span class="fn">printf</span>(<span class="str">"%p"</span>, p);    <span class="com">// 0x7ffee03bc67c  (moved by 4 bytes!)</span></pre>
+      </div>
+
+      <p>
+        A <code>float</code> takes up 4 bytes, so <code>p++</code> jumps the address
+        forward by 4 — not 1. If <code>p</code> were a <code>double *</code> (8 bytes),
+        it would jump by 8. This is exactly why a pointer's <em>type</em> matters: it
+        tells C how far "one step" is.
+      </p>
+
+      <table>
+        <tr><th>Type</th><th>Typical size</th><th>p++ moves forward by</th></tr>
+        <tr><td><code>char</code></td><td>1 byte</td><td>1 byte</td></tr>
+        <tr><td><code>int</code></td><td>4 bytes</td><td>4 bytes</td></tr>
+        <tr><td><code>float</code></td><td>4 bytes</td><td>4 bytes</td></tr>
+        <tr><td><code>double</code></td><td>8 bytes</td><td>8 bytes</td></tr>
+      </table>
+
+      <div class="callout note">
+        <span class="lbl">Note on Lab 08, Q3</span>
+        <p>
+          Your exact printed addresses will differ from anyone else's (and from run to
+          run) — that's normal. What matters is that the <em>difference</em> between the
+          "before" and "after" address matches the size of the data type (4 bytes for
+          <code>float</code>).
+        </p>
+      </div>
+
+      <!-- PRACTICE: ARITHMETIC -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Pointer arithmetic</span>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. <code>int *p</code> currently holds address <code>0x100</code>. After <code>p++</code>, what address does it hold? (Assume <code>int</code> is 4 bytes.)</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, '0x101 would be +1 byte. Pointer arithmetic moves by the size of the pointed-to type, not by 1 byte.')">0x101</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! An int is 4 bytes, so p++ moves the address forward by 4: 0x100 + 4 = 0x104.')">0x104</button>
+            <button class="opt" onclick="checkAnswer(this, false, '0x108 would be +8 bytes, which is the size of a double — not an int.')">0x108</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">predict the output</span>
+          <div class="q">2. The address of <code>x</code> is printed, then <code>p</code> is incremented. By how many bytes will the two addresses differ if <code>x</code> is a <code>double</code>?</div>
+          <div class="code-snippet"><span class="type">double</span> x = 1.5;
+<span class="type">double</span> *p = &amp;x;
+<span class="fn">printf</span>(<span class="str">"%p\n"</span>, p);
+p++;
+<span class="fn">printf</span>(<span class="str">"%p\n"</span>, p);</div>
+          <p>The addresses differ by: <input type="text" id="fi-arith-a" placeholder="? bytes"></p>
+          <button class="check-btn" onclick="checkFillIn('arith-out', ['fi-arith-a'], ['8','8 bytes'], 'Correct! A double is 8 bytes, so p++ moves the address forward by exactly 8 bytes.', 'Not quite. sizeof(double) = 8 bytes. Pointer arithmetic moves by the size of the type — so double* p++ moves by 8 bytes.')">Check answer</button>
+          <div class="fi-feedback" id="arith-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">3. Why does the <em>type</em> of a pointer matter for arithmetic? e.g. why is <code>char *</code> different from <code>int *</code>?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'Char and int pointers both store addresses and take the same size themselves. The difference is in how arithmetic moves them.')">A char* is smaller in memory than an int*</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! The type tells C how many bytes one "step" covers. char* moves 1 byte per increment; int* moves 4 bytes. Without the type, C couldn\'t know how big each element is.')">The type tells C the element size, so it knows how far one increment moves the pointer</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'You can do arithmetic on both char* and int* — the type just changes the step size.')">You can only do arithmetic on int* pointers, not char*</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ POINTERS AND ARRAYS ============ -->
+    <section id="arrays">
+      <h2><span class="tag">05 · concept</span></h2>
+      <h2 style="margin-top:-30px">Pointers and arrays are best friends</h2>
+      <p class="deck">
+        An array name is, deep down, just the address of its first element. This means
+        you can walk through an array using either square brackets <code>[ ]</code> or
+        pointer arithmetic — they're two views of the same thing.
+      </p>
+
+      <div class="code-block">
+        <span class="filename">arrays_and_pointers.c</span>
+<pre><span class="type">int</span> a[5] = {<span class="out">10</span>, <span class="out">20</span>, <span class="out">30</span>, <span class="out">40</span>, <span class="out">50</span>};
+<span class="type">int</span> *ptr = a;        <span class="com">// 'a' decays to &amp;a[0] - no &amp; needed!</span>
+
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *ptr);       <span class="com">// 10  (same as a[0])</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *(ptr + 1));  <span class="com">// 20  (same as a[1])</span></pre>
+      </div>
+
+      <div class="mem-row">
+        <div class="mem-box">
+          <div class="name">a[0]</div>
+          <div class="val">10</div>
+          <div class="addr">ptr →</div>
+        </div>
+        <div class="mem-box">
+          <div class="name">a[1]</div>
+          <div class="val">20</div>
+          <div class="addr">ptr+1 →</div>
+        </div>
+        <div class="mem-box">
+          <div class="name">a[2]</div>
+          <div class="val">30</div>
+        </div>
+        <div class="mem-box">
+          <div class="name">a[3]</div>
+          <div class="val">40</div>
+        </div>
+        <div class="mem-box">
+          <div class="name">a[4]</div>
+          <div class="val">50</div>
+        </div>
+      </div>
+
+      <h3>2D arrays through pointers</h3>
+      <p>
+        A 2D array is "an array of arrays." <code>arr[0][1]</code> and
+        <code>*(*(arr + 0) + 1)</code> are two ways of writing exactly the same thing.
+      </p>
+      <div class="code-block">
+        <span class="filename">ptr12.c</span>
+<pre><span class="type">int</span> arr[2][3] = {
+    {<span class="out">1</span>, <span class="out">2</span>, <span class="out">3</span>},
+    {<span class="out">4</span>, <span class="out">5</span>, <span class="out">6</span>}
+};
+
+<span class="fn">printf</span>(<span class="str">"%d"</span>, arr[0][1]);            <span class="com">// 2</span>
+<span class="fn">printf</span>(<span class="str">"%d"</span>, *(*(arr + 0) + 1));   <span class="com">// 2 - same value!</span></pre>
+      </div>
+      <div class="callout tip">
+        <span class="lbl">You don't need to memorise the double-star form</span>
+        <p>
+          For this course, the important takeaway is simply: <code>arr[i][j]</code> and
+          pointer arithmetic give the same result, because under the hood an array
+          <em>is</em> a contiguous block of memory addressed by its starting position.
+          Stick with <code>arr[i][j]</code> in your own code — it's clearer.
+        </p>
+      </div>
+
+      <h3>Passing arrays to functions</h3>
+      <p>
+        When you pass an array to a function, you're really passing a pointer to its
+        first element. That's why a function <em>can</em> modify the caller's array —
+        and why you usually pass the array's length as a separate parameter (the
+        function has no way to know how big the array is otherwise).
+      </p>
+      <div class="code-block">
+        <span class="filename">passing arrays (Lab 07, Q3 style)</span>
+<pre><span class="type">void</span> <span class="fn">findHottestColdest</span>(<span class="type">int</span> temps[], <span class="type">int</span> size, <span class="type">int</span> *hotIdx, <span class="type">int</span> *coldIdx) {
+    *hotIdx = *coldIdx = <span class="out">0</span>;
+    <span class="kw">for</span> (<span class="type">int</span> i = <span class="out">1</span>; i &lt; size; i++) {
+        <span class="kw">if</span> (temps[i] &gt; temps[*hotIdx])  *hotIdx  = i;
+        <span class="kw">if</span> (temps[i] &lt; temps[*coldIdx]) *coldIdx = i;
+    }
+}</pre>
+      </div>
+      <p>
+        This combines two ideas from this guide: the array <code>temps[]</code> is passed
+        by reference automatically, while <code>hotIdx</code> and <code>coldIdx</code> are
+        explicit output parameters used to return <em>two</em> results.
+      </p>
+
+      <!-- PRACTICE: ARRAYS -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Pointers &amp; arrays</span>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">predict the output</span>
+          <div class="q">1. What does each <code>printf</code> print?</div>
+          <div class="code-snippet"><span class="type">int</span> a[4] = {5, 10, 15, 20};
+<span class="type">int</span> *p = a;
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *p);        <span class="com">// line A</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *(p + 2));   <span class="com">// line B</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, p[3]);       <span class="com">// line C</span></div>
+          <p>A: <input type="text" id="fi-arr-a" placeholder="?"> &nbsp; B: <input type="text" id="fi-arr-b" placeholder="?"> &nbsp; C: <input type="text" id="fi-arr-c" placeholder="?"></p>
+          <button class="check-btn" onclick="checkFillIn('arr-out', ['fi-arr-a','fi-arr-b','fi-arr-c'], ['5','15','20'], 'Correct! *p = a[0] = 5. *(p+2) = a[2] = 15. p[3] is the same as *(p+3) = a[3] = 20.', 'Not quite. *p points to a[0]=5. *(p+2) jumps 2 ints forward to a[2]=15. p[3] is shorthand for *(p+3) = a[3]=20.')">Check answers</button>
+          <div class="fi-feedback" id="arr-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">2. You pass an array <code>int scores[10]</code> to a function. Inside the function, can you modify the original array's values?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'In C, arrays are always passed as a pointer to the first element — the function can see and change the original data.')">No — C makes a copy of the array when passing it</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! An array name decays to a pointer to its first element. The function operates on the same memory, so any writes modify the original array.')">Yes — the array is passed as a pointer, so changes affect the original</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'You can always modify through a plain array parameter — only const would prevent it.')">Only if you declare the parameter as const</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">3. Which of these correctly accesses element at row 1, column 2 of a 2D array <code>int m[3][4]</code>?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'C arrays are 0-indexed. Row 1, col 2 → m[1][2], not m[2][3].')">m[2][3]</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! 2D arrays are 0-indexed. Row 1, column 2 → m[1][2]. This is the same as *(*(m+1)+2) using pointer form.')">m[1][2]</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'This would be row 0, col 1 — you need index 1 for the second row and index 2 for the third column.')">m[0][1]</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ POINTER TO POINTER ============ -->
+    <section id="double-pointer">
+      <h2><span class="tag">06 · concept</span></h2>
+      <h2 style="margin-top:-30px">Pointer to a pointer</h2>
+      <p class="deck">
+        A pointer can store the address of another pointer. You'll see this written as
+        <code>int **ptr2</code>. It sounds scary but it's just one more layer of
+        "the address of."
+      </p>
+
+      <div class="code-block">
+        <span class="filename">ptr11.c</span>
+<pre><span class="type">int</span> var = <span class="out">10</span>;
+<span class="type">int</span> *ptr1 = &amp;var;     <span class="com">// ptr1 holds the address of var</span>
+<span class="type">int</span> **ptr2 = &amp;ptr1;   <span class="com">// ptr2 holds the address of ptr1</span>
+
+<span class="fn">printf</span>(<span class="str">"%d"</span>, var);     <span class="com">// 10</span>
+<span class="fn">printf</span>(<span class="str">"%d"</span>, *ptr1);   <span class="com">// 10 - one dereference</span>
+<span class="fn">printf</span>(<span class="str">"%d"</span>, **ptr2);  <span class="com">// 10 - two dereferences</span></pre>
+      </div>
+
+      <div class="mem-row">
+        <div class="mem-box">
+          <div class="name">var</div>
+          <div class="val">10</div>
+          <div class="addr">0x...1C</div>
+        </div>
+      </div>
+      <div class="arrow-down">↑ ptr1 points here</div>
+      <div class="mem-row">
+        <div class="mem-box">
+          <div class="name">ptr1</div>
+          <div class="val">0x...1C</div>
+          <div class="addr">0x...18</div>
+        </div>
+      </div>
+      <div class="arrow-down">↑ ptr2 points here</div>
+      <div class="mem-row">
+        <div class="mem-box">
+          <div class="name">ptr2</div>
+          <div class="val">0x...18</div>
+          <div class="addr">0x...14</div>
+        </div>
+      </div>
+
+      <p>
+        Each <code>*</code> "follows one arrow." <code>*ptr2</code> follows the arrow from
+        <code>ptr2</code> to <code>ptr1</code> (giving you an address). <code>**ptr2</code>
+        follows it twice, landing on <code>var</code>'s value.
+      </p>
+      <div class="callout note">
+        <span class="lbl">Will I need this for Lab 08?</span>
+        <p>
+          Not directly — none of the Lab 08 exercises require <code>**</code>. It's here
+          because Supplementary Material 9 covers it, and it helps make single pointers
+          feel less mysterious once you see the pattern repeats.
+        </p>
+      </div>
+
+      <!-- PRACTICE: POINTER TO POINTER -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Pointer to a pointer</span>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">predict the output</span>
+          <div class="q">1. What does this print?</div>
+          <div class="code-snippet"><span class="type">int</span> n = 42;
+<span class="type">int</span> *p  = &amp;n;
+<span class="type">int</span> **pp = &amp;p;
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, **pp);</div>
+          <p>Output: <input type="text" id="fi-dbl-a" placeholder="?"></p>
+          <button class="check-btn" onclick="checkFillIn('dbl-out', ['fi-dbl-a'], ['42'], 'Correct! **pp follows two pointers: pp → p → n, landing on n\'s value which is 42.', 'Not quite. **pp dereferences twice: first * gives p (the address of n), second * follows that to get n\'s value = 42.')">Check answer</button>
+          <div class="fi-feedback" id="dbl-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">2. How do you declare a pointer that stores the address of an <code>int *</code> pointer?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'int *pp declares a pointer to an int, not a pointer to a pointer-to-int.')">int *pp;</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! int **pp means pp is a pointer to a pointer to int — two levels of indirection.')">int **pp;</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'int &pp is not valid C syntax for a pointer declaration.')">int &amp;pp;</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONST AND VOID POINTERS ============ -->
+    <section id="const">
+      <h2><span class="tag">07 · concept</span></h2>
+      <h2 style="margin-top:-30px">const pointers, void pointers, NULL</h2>
+
+      <h3>Pointer to a constant</h3>
+      <p>
+        <code>const int *p</code> means: "you cannot change the value <em>through</em>
+        <code>p</code>" — but <code>p</code> itself can still be reassigned to point
+        somewhere else.
+      </p>
+      <div class="code-block">
+        <span class="filename">ptr10.c</span>
+<pre><span class="type">int</span> a = <span class="out">10</span>, b = <span class="out">20</span>;
+<span class="kw">const</span> <span class="type">int</span> *p = &amp;a;
+
+<span class="fn">printf</span>(<span class="str">"%d"</span>, *p);  <span class="com">// 10</span>
+<span class="com">// *p = 15;       -> ERROR: cannot modify through a const pointer</span>
+p = &amp;b;             <span class="com">// OK - p itself can be reassigned</span>
+<span class="fn">printf</span>(<span class="str">"%d"</span>, *p);  <span class="com">// 20</span></pre>
+      </div>
+
+      <h3>NULL pointers</h3>
+      <p>
+        A pointer that doesn't point to anything yet should be set to <code>NULL</code>.
+        Always initialise pointers — an "uninitialised" pointer could point to a random,
+        dangerous address.
+      </p>
+      <div class="code-block">
+        <span class="filename">safe declaration</span>
+<pre><span class="type">int</span> *ptr = <span class="kw">NULL</span>;
+
+<span class="com">// Before using a pointer that might be NULL, always check:</span>
+<span class="kw">if</span> (fp == <span class="kw">NULL</span>) {
+    <span class="fn">printf</span>(<span class="str">"Error opening file.\n"</span>);
+} <span class="kw">else</span> {
+    <span class="com">// safe to use fp</span>
+}</pre>
+      </div>
+
+      <h3>void pointers (generic pointers)</h3>
+      <p>
+        A <code>void *</code> can point to <em>any</em> type, but you must "cast" it to
+        the correct type before dereferencing it.
+      </p>
+      <div class="code-block">
+        <span class="filename">ptr6.c</span>
+<pre><span class="type">int</span> a = <span class="out">10</span>;
+<span class="type">double</span> b = <span class="out">3.0</span>;
+<span class="type">void</span> *ptr;
+
+ptr = &amp;a;
+<span class="fn">printf</span>(<span class="str">"%d"</span>, *(<span class="type">int</span>*)ptr);     <span class="com">// cast back to int* first</span>
+
+ptr = &amp;b;
+<span class="fn">printf</span>(<span class="str">"%.2f"</span>, *(<span class="type">double</span>*)ptr); <span class="com">// cast back to double*</span></pre>
+      </div>
+
+      <div class="callout warn">
+        <span class="lbl">Dangling pointers</span>
+        <p>
+          After you <code>free()</code> dynamically allocated memory, the pointer still
+          holds the old address — but that memory is no longer yours. Using it afterwards
+          gives unpredictable results. Always set the pointer to <code>NULL</code> right
+          after freeing it: <code>ptr = NULL;</code>
+        </p>
+      </div>
+
+      <!-- PRACTICE: CONST/NULL/VOID -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — const, void &amp; NULL pointers</span>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. Given <code>const int *p = &amp;x;</code>, which of these is allowed?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'const int *p means you cannot change the value through p. *p = 99 would be a compile error.')">*p = 99;</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! const int *p only protects the pointed-to value. The pointer itself (p) can still be reassigned to point somewhere else.')">p = &amp;y; (redirecting p to another int y)</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'Both of these are restricted or a compile error — *p = 99 breaks the const rule.')">Both of the above</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">2. Why should you always initialise a pointer to <code>NULL</code> if you're not pointing it at something yet?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'NULL doesn\'t make the pointer smaller — all pointers are the same size regardless.')">It makes the pointer use less memory</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! An uninitialised pointer contains a random/garbage address. Writing through it could corrupt memory. NULL is a safe sentinel value you can check for before use.')">An uninitialised pointer has a garbage address; using it causes undefined behaviour</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'NULL does not help with type checking — that\'s the compiler\'s job based on the pointer\'s declared type.')">It helps the compiler do type checking</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">fill in the blank</span>
+          <div class="q">3. A <code>void *</code> pointer can hold any address, but you must _____ it before dereferencing. Complete the print statement for a <code>void *</code> pointing at a <code>double</code>.</div>
+          <div class="code-snippet"><span class="type">double</span> d = 9.5;
+<span class="type">void</span> *vp = &amp;d;
+<span class="fn">printf</span>(<span class="str">"%.1f"</span>, *( _____ )vp);  <span class="com">// what cast goes here?</span></div>
+          <p>The cast is: <input type="text" id="fi-void-a" placeholder="e.g. (int*)"></p>
+          <button class="check-btn" onclick="checkFillIn('void-out', ['fi-void-a'], ['(double*)','(double *)'], 'Correct! You cast vp to (double*) before dereferencing, telling C to read 8 bytes as a double.', 'Not quite. vp holds a double\'s address, so cast it to (double*) before dereferencing: *((double*)vp).')">Check answer</button>
+          <div class="fi-feedback" id="void-out"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FUNCTION POINTERS ============ -->
+    <section id="func-pointers">
+      <h2><span class="tag">08 · concept</span></h2>
+      <h2 style="margin-top:-30px">Function pointers (for Lab 08, Q5)</h2>
+      <p class="deck">
+        Just like a pointer can store the address of a variable, it can also store the
+        address of a <strong>function</strong>. This lets you pass a function as an
+        argument — so a "generic" function can decide <em>how</em> to compare things
+        based on what you hand it.
+      </p>
+
+      <div class="code-block">
+        <span class="filename">function pointer syntax</span>
+<pre><span class="com">// A pointer to a function that takes (int, int) and returns int:</span>
+<span class="type">int</span> (*compare)(<span class="type">int</span>, <span class="type">int</span>);
+
+<span class="com">// max() accepts such a pointer as its third parameter:</span>
+<span class="type">int</span> <span class="fn">max</span>(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> (*compareFn)(<span class="type">int</span>, <span class="type">int</span>)) {
+    <span class="kw">if</span> (compareFn(a, b) &gt; <span class="out">0</span>)
+        <span class="kw">return</span> a;
+    <span class="kw">return</span> b;
+}</pre>
+      </div>
+
+      <p>
+        Now you can write two different comparison functions and let the caller choose
+        which logic <code>max()</code> should use:
+      </p>
+      <div class="code-block">
+        <span class="filename">two comparison strategies</span>
+<pre><span class="type">int</span> <span class="fn">compare</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+    <span class="kw">if</span> (a &gt; b) <span class="kw">return</span> 1;
+    <span class="kw">if</span> (b &gt; a) <span class="kw">return</span> -1;
+    <span class="kw">return</span> 0;
+}
+
+<span class="type">int</span> <span class="fn">compare_absolute</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+    <span class="kw">return</span> compare(<span class="fn">abs</span>(a), <span class="fn">abs</span>(b));
+}
+
+<span class="com">// In main():</span>
+<span class="fn">max</span>(8, -10, compare);            <span class="com">// -> 8   (normal comparison: 8 > -10)</span>
+<span class="fn">max</span>(8, -10, compare_absolute);   <span class="com">// -> -10 (|−10| > |8|, so -10 "wins")</span></pre>
+      </div>
+
+      <div class="callout tip">
+        <span class="lbl">Mental model</span>
+        <p>
+          Pass a function's <em>name</em> (no parentheses, no arguments) to hand over its
+          address. Inside <code>max()</code>, calling <code>compareFn(a, b)</code> actually
+          runs whichever function was passed in. This is the same idea as a "strategy" —
+          the logic for comparing is swapped out without rewriting <code>max()</code>.
+        </p>
+      </div>
+
+      <!-- PRACTICE: FUNCTION POINTERS -->
+      <div class="practice-set">
+        <div class="ps-header">
+          <span class="ps-icon">✏ practice</span>
+          <span class="ps-title">Check yourself — Function pointers</span>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">multiple choice</span>
+          <div class="q">1. You want to pass a function <code>int square(int n)</code> as an argument. Which call is correct?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'square(5) calls the function immediately and passes its int result — not a pointer to the function.')">apply(5, square(5))</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! Writing square without parentheses gives the function\'s address (a function pointer) — apply() can then call it later.')">apply(5, square)</button>
+            <button class="opt" onclick="checkAnswer(this, false, '&square technically gives the address too, but in C passing the bare name (square) is the conventional and standard way.')">apply(5, &amp;square)</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="fill-in">
+          <span class="q-type">fill in the blank</span>
+          <div class="q">2. Complete the function pointer declaration for a pointer named <code>op</code> that points to a function taking two <code>int</code>s and returning an <code>int</code>.</div>
+          <div class="code-snippet"><span class="type">int</span> (*op)( _____ , _____ );</div>
+          <p>First blank: <input type="text" id="fi-fp-a" placeholder="type"> &nbsp; Second blank: <input type="text" id="fi-fp-b" placeholder="type"></p>
+          <button class="check-btn" onclick="checkFillIn('fp-out', ['fi-fp-a','fi-fp-b'], ['int','int'], 'Correct! int (*op)(int, int) declares a function pointer that can hold any function taking two ints and returning an int.', 'Not quite. The function takes two int parameters, so both blanks should be int: int (*op)(int, int)')">Check answers</button>
+          <div class="fi-feedback" id="fp-out"></div>
+        </div>
+
+        <div class="quiz practice">
+          <span class="q-type">predict the output</span>
+          <div class="q">3. Using the <code>compare</code> and <code>compare_absolute</code> functions from this section — what does <code>max(-3, 2, compare)</code> return?</div>
+          <div class="options">
+            <button class="opt" onclick="checkAnswer(this, false, 'compare(-3, 2): is -3 > 2? No. So compare returns -1, meaning b(=2) wins.')">-3</button>
+            <button class="opt" onclick="checkAnswer(this, true, 'Correct! compare(-3, 2) checks if -3 > 2 — it\'s not, so it returns -1 (b > a), and max() returns b which is 2.')">2</button>
+            <button class="opt" onclick="checkAnswer(this, false, 'compare_absolute would give |-3|=3 > |2|=2, so -3 would win under absolute comparison — but this question uses plain compare.')">3</button>
+          </div>
+          <div class="feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAB 8 WALKTHROUGH ============ -->
+    <section id="lab8">
+      <h2><span class="tag">lab 08</span></h2>
+      <h2 style="margin-top:-30px">Lab 08 — task-by-task map</h2>
+      <p class="deck">
+        Here's which concept from this guide each Lab 08 task uses. Read the matching
+        section above first, then attempt the task.
+      </p>
+
+      <div class="lab-grid">
+        <div class="lab-card">
+          <div class="num">TASK 1</div>
+          <h4>Pointer manipulation, 3 variables</h4>
+          <p>Write <code>calculate(int *x, int *y, int *z)</code> that sets
+          <code>*x</code> to a sum, <code>*y</code> to a difference, <code>*z</code> to
+          a product — all through pointers passed from <code>main()</code>.</p>
+          <div class="skills">Uses: Pointer basics, Output parameters</div>
+        </div>
+        <div class="lab-card">
+          <div class="num">TASK 2</div>
+          <h4>Circle circumference &amp; area</h4>
+          <p><code>calculate_circle(float radius, float *circumference, float *area)</code>
+          — one input, two outputs. Classic "function returning multiple values."</p>
+          <div class="skills">Uses: Output parameters</div>
+        </div>
+        <div class="lab-card">
+          <div class="num">TASK 3</div>
+          <h4>Pointer arithmetic on a float</h4>
+          <p>Print a pointer's address, then <code>p++</code> and print again. Confirm
+          the addresses differ by 4 bytes (size of <code>float</code>).</p>
+          <div class="skills">Uses: Pointer arithmetic</div>
+        </div>
+        <div class="lab-card">
+          <div class="num">TASK 4</div>
+          <h4>Swap two integers</h4>
+          <p><code>swap(int *a, int *b)</code> using a temporary variable. Print values
+          before and after to confirm the swap happened in <code>main()</code>'s
+          variables.</p>
+          <div class="skills">Uses: Pointer basics, Output/input-output params</div>
+        </div>
+        <div class="lab-card">
+          <div class="num">TASK 5</div>
+          <h4>Function pointers for max()</h4>
+          <p>Write <code>compare</code> and <code>compare_absolute</code>, then a
+          <code>max(int a, int b, int (*compare)(int,int))</code> that uses whichever
+          comparison function is passed in.</p>
+          <div class="skills">Uses: Function pointers</div>
+        </div>
+        <div class="lab-card">
+          <div class="num">TASK 6</div>
+          <h4>Simplify a fraction (GCD)</h4>
+          <p><code>simplify_fraction(int *numerator, int *denominator)</code> — both are
+          input <em>and</em> output parameters. Use a GCD helper to reduce the fraction
+          in place.</p>
+          <div class="skills">Uses: Output parameters, Input/output pointers</div>
+        </div>
+      </div>
+
+      <h3>Worked example: Task 4 (Swap), fully traced</h3>
+      <div class="code-block">
+        <span class="filename">swap.c</span>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="type">void</span> <span class="fn">swap</span>(<span class="type">int</span> *a, <span class="type">int</span> *b) {
+    <span class="type">int</span> temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">int</span> x = <span class="out">5</span>, y = <span class="out">10</span>;
+    <span class="fn">printf</span>(<span class="str">"Before swap: a = %d, b = %d\n"</span>, x, y);
+
+    <span class="fn">swap</span>(&amp;x, &amp;y);
+
+    <span class="fn">printf</span>(<span class="str">"After swap: a = %d, b = %d\n"</span>, x, y);
+    <span class="kw">return</span> 0;
+}
+<span class="com">/* OUTPUT
+Before swap: a = 5, b = 10
+After swap: a = 10, b = 5
+*/</span></pre>
+      </div>
+      <p>Step by step, inside <code>swap</code>:</p>
+      <table>
+        <tr><th>Line</th><th>What happens</th><th>a (=&amp;x)</th><th>b (=&amp;y)</th><th>temp</th></tr>
+        <tr><td><code>int temp = *a;</code></td><td>copy the value at address a (which is x = 5) into temp</td><td>5</td><td>10</td><td>5</td></tr>
+        <tr><td><code>*a = *b;</code></td><td>copy the value at address b (10) into the address a points to → x becomes 10</td><td>10</td><td>10</td><td>5</td></tr>
+        <tr><td><code>*b = temp;</code></td><td>copy temp (5) into the address b points to → y becomes 5</td><td>10</td><td>5</td><td>5</td></tr>
+      </table>
+      <p>
+        Because <code>a</code> and <code>b</code> are addresses of <code>x</code> and
+        <code>y</code> in <code>main()</code>, every <code>*a</code> / <code>*b</code>
+        write reaches all the way back into <code>main()</code>'s variables.
+      </p>
+
+      <h3>Worked example: Task 6 (Simplify a fraction)</h3>
+      <p>
+        The hint says to use the GCD (Greatest Common Divisor). Here's the structure —
+        try filling in the GCD logic yourself before checking:
+      </p>
+      <div class="code-block">
+        <span class="filename">simplify_fraction.c — skeleton</span>
+<pre><span class="type">int</span> <span class="fn">gcd</span>(<span class="type">int</span> a, <span class="type">int</span> b) {
+    <span class="kw">while</span> (b != <span class="out">0</span>) {
+        <span class="type">int</span> temp = b;
+        b = a % b;
+        a = temp;
+    }
+    <span class="kw">return</span> a;
+}
+
+<span class="type">void</span> <span class="fn">simplify_fraction</span>(<span class="type">int</span> *numerator, <span class="type">int</span> *denominator) {
+    <span class="type">int</span> g = <span class="fn">gcd</span>(*numerator, *denominator);
+    *numerator   = *numerator   / g;
+    *denominator = *denominator / g;
+}
+
+<span class="com">// main(): for input 8/12 -> gcd(8,12) = 4 -> 8/4=2, 12/4=3 -> "2/3"</span></pre>
+      </div>
+      <div class="callout tip">
+        <span class="lbl">Why is this "input/output"?</span>
+        <p>
+          <code>numerator</code> and <code>denominator</code> start as the values typed
+          by the user (input), and the same pointers are used to write the simplified
+          result back (output) — overwriting the originals rather than creating new
+          variables.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ LAB 7 RECAP ============ -->
+    <section id="lab7">
+      <h2><span class="tag">lab 07 recap</span></h2>
+      <h2 style="margin-top:-30px">Arrays — quick recap before pointers</h2>
+      <p class="deck">
+        Pointers and arrays are tightly linked, so a 60-second refresher on Lab 07
+        helps Lab 08 click faster.
+      </p>
+
+      <table>
+        <tr><th>Question</th><th>What it practiced</th><th>Key idea to remember</th></tr>
+        <tr>
+          <td>Q1 — Mid-term marks</td>
+          <td>Looping, summation, average</td>
+          <td><code>for</code> loops are how you visit every element: <code>a[i]</code> for <code>i = 0 … n-1</code></td>
+        </tr>
+        <tr>
+          <td>Q2 — Cricket scores</td>
+          <td>Linear search for max</td>
+          <td>Track the "best so far" index while looping once through the array</td>
+        </tr>
+        <tr>
+          <td>Q3 — Temperature over a week</td>
+          <td>Passing arrays to functions</td>
+          <td>An array parameter is really a pointer + you must also pass its size</td>
+        </tr>
+        <tr>
+          <td>Q4 — Product prices</td>
+          <td>Parallel arrays</td>
+          <td>Two arrays (names[], prices[]) where index <code>i</code> in one corresponds to index <code>i</code> in the other</td>
+        </tr>
+        <tr>
+          <td>Q5 — Elections</td>
+          <td>Sorting &amp; searching</td>
+          <td>Sort the votes, then the winner is simply the largest value</td>
+        </tr>
+        <tr>
+          <td>Q6 — Rainfall</td>
+          <td>2D arrays</td>
+          <td><code>data[week][day]</code> — nested loops, one for each dimension</td>
+        </tr>
+      </table>
+
+      <div class="callout note">
+        <span class="lbl">The bridge to Lab 08</span>
+        <p>
+          In Lab 07, arrays were passed to functions "automatically by reference" — you
+          didn't need to think about pointers explicitly. Lab 08 makes that mechanism
+          explicit: now <em>you</em> write <code>int *x</code> and use
+          <code>&amp;</code> / <code>*</code> yourself, for single variables instead of
+          whole arrays.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ SELF-CHECK QUIZ ============ -->
+    <section id="quiz">
+      <h2><span class="tag">self-check</span></h2>
+      <h2 style="margin-top:-30px">Quick quiz — are you ready for the lecture?</h2>
+      <p class="deck">Try these before your next session. Click an answer to check it.</p>
+
+      <div class="quiz">
+        <div class="q">1. Given <code>int x = 5; int *p = &amp;x;</code> — what does <code>*p = 9;</code> do?</div>
+        <div class="options">
+          <button class="opt" onclick="checkAnswer(this, false, 'p now points to a new variable that equals 9 — incorrect. *p = 9 changes the value AT the address p holds, which is x itself.')">Creates a new variable equal to 9</button>
+          <button class="opt" onclick="checkAnswer(this, true, 'Correct! *p = 9 dereferences p and overwrites the value stored at that address — so x becomes 9.')">Changes x to 9</button>
+          <button class="opt" onclick="checkAnswer(this, false, 'p stores an address, not a value — this line does not change p itself.')">Changes p to 9</button>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="q">2. A function needs to return both the area AND perimeter of a rectangle. What's the best approach?</div>
+        <div class="options">
+          <button class="opt" onclick="checkAnswer(this, false, 'A single return can only carry one value back.')">Use two separate return statements</button>
+          <button class="opt" onclick="checkAnswer(this, true, 'Correct! Pass pointers to two variables as output parameters, then write the results via *areaP and *perimeterP.')">Use output parameters (pointers)</button>
+          <button class="opt" onclick="checkAnswer(this, false, 'Globals work but make code harder to test and reuse — output parameters are the standard pattern here.')">Use two global variables</button>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="q">3. <code>int arr[5]; int *p = arr;</code> — what does <code>*(p + 2)</code> give you?</div>
+        <div class="options">
+          <button class="opt" onclick="checkAnswer(this, false, 'p + 2 moves the pointer 2 ints forward, not 2 bytes.')">arr[0] shifted by 2 bytes</button>
+          <button class="opt" onclick="checkAnswer(this, true, 'Correct! Pointer arithmetic on an int* moves by sizeof(int) per step, so p+2 points to arr[2], and *(p+2) is its value.')">The value of arr[2]</button>
+          <button class="opt" onclick="checkAnswer(this, false, 'p + 2 is still a valid address inside the array (for a size-5 array) — this would only be an error for much larger offsets.')">A compile error — out of bounds</button>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="q">4. Where is a variable declared <em>inside</em> an <code>if</code> block visible?</div>
+        <div class="options">
+          <button class="opt" onclick="checkAnswer(this, false, 'Global scope is for variables declared outside every function.')">Everywhere in the program</button>
+          <button class="opt" onclick="checkAnswer(this, false, 'It is not visible to the whole function — only inside that block.')">Anywhere inside the enclosing function</button>
+          <button class="opt" onclick="checkAnswer(this, true, 'Correct! This is block scope — the variable only exists within the { } it was declared in.')">Only inside that if block's { }</button>
+        </div>
+        <div class="feedback"></div>
+      </div>
+
+      <div class="quiz">
+        <div class="q">5. What must you pass to a function that expects a function pointer parameter, like <code>max(a, b, compare)</code>?</div>
+        <div class="options">
+          <button class="opt" onclick="checkAnswer(this, false, 'Calling compare() yourself would run it immediately and pass its int result — not what max() expects here.')">The result of calling compare(a, b)</button>
+          <button class="opt" onclick="checkAnswer(this, true, 'Correct! Just the function name (no parentheses) passes its address, letting max() call it later.')">The function name compare (no parentheses)</button>
+          <button class="opt" onclick="checkAnswer(this, false, 'String literals are for text, not for referring to a function.')">A string "compare"</button>
+        </div>
+        <div class="feedback"></div>
+      </div>
+    </section>
+
+    <!-- ============ COMMON PITFALLS ============ -->
+    <section id="pitfalls">
+      <h2><span class="tag">reference</span></h2>
+      <h2 style="margin-top:-30px">Common beginner mistakes</h2>
+
+      <div class="callout warn">
+        <span class="lbl">Forgetting &amp; when calling</span>
+        <p>
+          If a function expects <code>int *x</code>, you must call it with
+          <code>&amp;myVariable</code>, not just <code>myVariable</code>. Passing the
+          value instead of the address is one of the most common compile errors for
+          beginners (often shown as a type mismatch warning).
+        </p>
+      </div>
+
+      <div class="callout warn">
+        <span class="lbl">Confusing declaration * with dereference *</span>
+        <p>
+          <code>int *p;</code> — the <code>*</code> here means "p is a pointer."<br>
+          <code>*p = 5;</code> — the <code>*</code> here means "go to the address p holds,
+          and write 5 there."<br>
+          Same symbol, different meaning depending on context — this trips up almost
+          everyone at first.
+        </p>
+      </div>
+
+      <div class="callout warn">
+        <span class="lbl">Using a pointer before it points anywhere</span>
+        <p>
+          <code>int *p; *p = 5;</code> — <code>p</code> hasn't been told an address yet,
+          so <code>*p = 5</code> writes to a random/unsafe location. Always assign
+          <code>p = &amp;something;</code> (or <code>p = NULL;</code> if not ready yet)
+          before dereferencing.
+        </p>
+      </div>
+
+      <div class="callout warn">
+        <span class="lbl">Mismatched pointer types</span>
+        <p>
+          Don't store an <code>int</code>'s address in a <code>float *</code>. The
+          compiler will warn you — listen to that warning, because dereferencing will
+          read/write the wrong number of bytes.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ GLOSSARY ============ -->
+    <section id="glossary">
+      <h2><span class="tag">reference</span></h2>
+      <h2 style="margin-top:-30px">Glossary</h2>
+      <dl class="glossary">
+        <dt>pointer</dt>
+        <dd>A variable that stores the memory address of another variable.</dd>
+
+        <dt>& (address-of operator)</dt>
+        <dd>Returns the memory address of the variable it's applied to.</dd>
+
+        <dt>* (indirection / dereference operator)</dt>
+        <dd>In a declaration, marks a variable as a pointer. Elsewhere, accesses or sets the value at the address a pointer holds.</dd>
+
+        <dt>output parameter</dt>
+        <dd>A pointer parameter a function uses to "write back" a result into the caller's variable.</dd>
+
+        <dt>input/output parameter</dt>
+        <dd>A pointer parameter whose pointed-to value is both read from and written back to during the function call (e.g. swap, simplify_fraction).</dd>
+
+        <dt>scope</dt>
+        <dd>The region of code where a name (variable/function) is visible and usable.</dd>
+
+        <dt>pointer arithmetic</dt>
+        <dd>Adding/subtracting integers from a pointer moves it by that many <em>elements</em> (not bytes), based on the pointed-to type's size.</dd>
+
+        <dt>NULL</dt>
+        <dd>A special value meaning "this pointer points to nothing." Always check for it, and initialise pointers to it before use.</dd>
+
+        <dt>dangling pointer</dt>
+        <dd>A pointer that still holds an address after that memory has been freed — using it is unsafe.</dd>
+
+        <dt>void pointer</dt>
+        <dd>A "generic" pointer with no associated type; must be cast to a specific type before dereferencing.</dd>
+
+        <dt>function pointer</dt>
+        <dd>A pointer that stores the address of a function, allowing the function to be called indirectly or passed as an argument.</dd>
+      </dl>
+    </section>
+
+    <footer>
+      <p>
+        Built from: Lecture 6 (Pointers &amp; Modular Programming), Lab 07 (Arrays),
+        Lab 08 (Pointers &amp; Modular Programming), and Supplementary Materials 7–9 —
+        Programming Methodology, SE1012.
+      </p>
+      <div class="pill-list">
+        <span class="pill">&amp; address-of</span>
+        <span class="pill">* dereference</span>
+        <span class="pill">output params</span>
+        <span class="pill">scope</span>
+        <span class="pill">pointer arithmetic</span>
+        <span class="pill">function pointers</span>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // ---------- Scroll-spy for sidebar ----------
+  const sections = document.querySelectorAll('main section, main header');
+  const links = document.querySelectorAll('.sidebar a');
+
+  function onScroll() {
+    let current = '';
+    sections.forEach(sec => {
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 120) current = sec.id;
+    });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  document.addEventListener('scroll', onScroll);
+  onScroll();
+
+  // ---------- MCQ quiz logic ----------
+  function checkAnswer(btn, isCorrect, message) {
+    const group = btn.parentElement;
+    const feedback = group.nextElementSibling;
+    group.querySelectorAll('button').forEach(b => {
+      b.disabled = true;
+      b.classList.remove('correct', 'incorrect');
+    });
+    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+    feedback.textContent = message;
+    feedback.classList.add('show');
+    feedback.style.color = isCorrect ? 'var(--mem)' : 'var(--accent)';
+  }
+
+  // ---------- Fill-in / predict-output logic ----------
+  function checkFillIn(feedbackId, inputIds, correctAnswers, successMsg, failMsg) {
+    let allCorrect = true;
+    inputIds.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const userVal = el.value.trim().toLowerCase();
+      const correct = correctAnswers[i].toLowerCase();
+      el.classList.remove('correct-fi', 'incorrect-fi');
+      el.disabled = true;
+      if (userVal === correct) {
+        el.classList.add('correct-fi');
+      } else {
+        el.classList.add('incorrect-fi');
+        allCorrect = false;
+      }
+    });
+    const fb = document.getElementById(feedbackId);
+    if (fb) {
+      fb.textContent = allCorrect ? successMsg : failMsg;
+      fb.style.color = allCorrect ? 'var(--mem)' : 'var(--accent)';
+      fb.classList.add('show');
+    }
+  }
+
+  // ---------- Pointer playground ----------
+  let pgState = 0;
+
+  function pgReset() {
+    pgState = 0;
+    document.getElementById('pg-m').style.display = 'none';
+    document.getElementById('pg-p').style.display = 'none';
+    document.getElementById('pg-m-val').textContent = '?';
+    document.getElementById('pg-p-val').textContent = '?';
+    document.getElementById('pg-p-points').textContent = 'points to: —';
+    document.getElementById('pg-m').classList.remove('pointer');
+    document.getElementById('pg-log').innerHTML = '<div class="line">// Output will appear here as you click each step…</div>';
+  }
+
+  function pgLog(text) {
+    const log = document.getElementById('pg-log');
+    const line = document.createElement('div');
+    line.className = 'line';
+    line.textContent = text;
+    log.appendChild(line);
+  }
+
+  function pgStep(n) {
+    const mBox = document.getElementById('pg-m');
+    const pBox = document.getElementById('pg-p');
+    const mVal = document.getElementById('pg-m-val');
+    const pVal = document.getElementById('pg-p-val');
+    const pPoints = document.getElementById('pg-p-points');
+
+    if (n === 1) {
+      mBox.style.display = 'block';
+      mVal.textContent = '25';
+      pgReset_log_only();
+      pgLog('> int m = 25;');
+      pgLog('// m is created in memory and set to 25');
+    } else if (n === 2) {
+      if (mBox.style.display === 'none') { pgStep(1); }
+      pBox.style.display = 'block';
+      pVal.textContent = '0x1000';
+      pPoints.textContent = 'points to: m';
+      pgLog('> int *p = &m;');
+      pgLog('// p now stores the ADDRESS of m (0x1000)');
+    } else if (n === 3) {
+      if (pBox.style.display === 'none') { pgStep(2); }
+      pgLog('> printf("%d", *p);');
+      pgLog('Output: ' + mVal.textContent);
+      pgLog('// *p means "go to address p holds, read the value" -> ' + mVal.textContent);
+    } else if (n === 4) {
+      if (pBox.style.display === 'none') { pgStep(2); }
+      mVal.textContent = '35';
+      mBox.style.transform = 'scale(1.05)';
+      setTimeout(() => { mBox.style.transform = 'scale(1)'; }, 200);
+      pgLog('> *p = 35;');
+      pgLog('// *p = 35 writes 35 to the address p holds -> m is now 35');
+    } else if (n === 5) {
+      pgLog('> printf("%d", m);');
+      pgLog('Output: ' + mVal.textContent);
+      pgLog('// m really changed, because *p = 35 wrote directly into m\'s memory');
+    }
+  }
+
+  function pgReset_log_only() {
+    document.getElementById('pg-log').innerHTML = '';
+  }
+</script>
+
+</body>
+</html>
